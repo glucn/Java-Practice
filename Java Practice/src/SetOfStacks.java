@@ -25,21 +25,25 @@ public class SetOfStacks {
 		SetOfStacks set = new SetOfStacks(3);
 		for(int i=0; i<10; i++) {
 			set.push(i);
-			System.out.println("Push: "+i+"\ton Stack "+set.getNumOfStacks()+"\t Stack height "+set.getLastStackHeight());
+			System.out.println("Push: "+i+"\ton Stack "+(set.getNumOfStacks()-1)+"\t Stack height "+set.getLastStackHeight());
 		}
 		
-		for(int i=0; i<10; i++) {
+		/*
+		for(int i=0; i<11; i++) {
 			int num = set.getNumOfStacks();
 			int last = set.getLastStackHeight();
 			System.out.println("Pop: "+set.pop()+"\ton Stack "+num+"\t Stack height "+last);
+		}
+		*/
+		
+		for(int i=0; i<11; i++) {
+			System.out.println("Pop: "+set.popAt(1)+"\ton Stack "+ 1);
 		}
 
 	}
 
 	private ArrayList<Stack<Integer>> stacks;
 	private int MaxHeight;
-	private int LastStackHeight;
-	private int NumOfStacks;
 	
 	SetOfStacks(int MaxHeight){
 		if(MaxHeight <= 0) {System.out.println("Wrong Input!"); this.MaxHeight = 0; return;}
@@ -47,36 +51,65 @@ public class SetOfStacks {
 		this.stacks = new ArrayList<Stack<Integer>>();
 	}
 	
+	Stack<Integer> getLastStack(){
+		if(stacks.size()==0) return null;
+		else return stacks.get(stacks.size()-1);
+	}
+	
 	Integer pop() {
-		if(NumOfStacks == 0) {
+		if(stacks.size() == 0) {
 			System.out.println("Stack is Empty!");
-			return Integer.valueOf(-9999);
+			return Integer.valueOf(-999999);
 		}
-		Integer result = stacks.get(NumOfStacks-1).pop();
-		--LastStackHeight;
-		if(LastStackHeight==0) {
-			stacks.remove(NumOfStacks-1);
-			--NumOfStacks;
-			LastStackHeight = NumOfStacks==0?0:MaxHeight;
+		Stack<Integer> last = this.getLastStack();
+		Integer result = last.pop();
+		if(last.size()==0) {
+			stacks.remove(stacks.size()-1);
 		}
 		return result;
 	}
 	
 	Integer push(Integer n) {
-		if(stacks.isEmpty() || LastStackHeight == MaxHeight) {
-			stacks.add(new Stack<Integer>());
-			++NumOfStacks;
-			LastStackHeight = 1;
-			stacks.get(NumOfStacks-1).push(n);
+		Stack<Integer> last = this.getLastStack();
+		if(last==null || last.size() == this.MaxHeight) {
+			Stack<Integer> newStack = new Stack<Integer>();
+			newStack.push(n);
+			stacks.add(newStack);
 			return n;
 		}
 		else {
-			stacks.get(NumOfStacks-1).push(n);
-			++LastStackHeight;
+			last.push(n);
 			return n;
 		}
 	}
 	
-	int getNumOfStacks() {return NumOfStacks;}
-	int getLastStackHeight() {return LastStackHeight;}
+	Integer popAt(int index) {
+		//Stack<Integer> last = this.getLastStack();
+		if(index >= stacks.size()) {
+			System.out.println("There is no such stack!");
+			return Integer.valueOf(-999999);
+		}
+		else if(stacks.size() == 0) {
+			System.out.println("Stack is Empty!");
+			return Integer.valueOf(-999999);
+		} 
+		else {
+			Stack<Integer> targetStack = stacks.get(index);
+			Integer number = targetStack.pop();
+			if(targetStack.isEmpty()) {
+				stacks.remove(index);
+			}
+			return number;
+			// Problem is: not all the stacks are full after popAt() 
+			// There is a tradeoff to roll the bottom of next stack onto the top of this stack.
+		}
+	}
+	
+	
+	int getNumOfStacks() {return stacks.size();}
+	int getLastStackHeight() {
+		Stack<Integer> last = this.getLastStack();
+		if(last==null) return 0;
+		else return(last.size());
+	}
 }
