@@ -17,7 +17,7 @@ public class BinaryTree {
 		BinaryTree bt = new BinaryTree();
 		
 		for(int i = 0; i<5; i++) {
-			bt.AddNodeAsBST((int)(Math.random()*10));
+			bt.InsertNode((int)(Math.random()*10));
 		}
 		
 		System.out.println("PreOrder:");
@@ -31,6 +31,7 @@ public class BinaryTree {
 		if(bt.isBalanced()) System.out.println("Balanced Tree");
 		else System.out.println("Not a Balanced Tree");
 		
+		System.out.println(bt.root.NextNodeInOrder().value);
 	}
 
 	Node root;
@@ -71,9 +72,9 @@ public class BinaryTree {
 	void InOrderTraversal() {InOrderTraversal(this.root);}
 	void PostOrderTraversal() {PostOrderTraversal(this.root);}
 	
-	void AddNodeAsBST(int n) {
+	void InsertNode(int n) {
 		if (root==null) root = new Node(n);
-		else root.AddNodeAsBST(n);
+		else root.InsertNode(n);
 	}
 }
 
@@ -126,14 +127,39 @@ class Node{
 		else return(RightMinDepth+1);
 	}
 	
-	void AddNodeAsBST(int n) {
+	void InsertNode(int n) {
 		if (n<= this.value) {
 			if(this.left == null) {this.left=new Node(n, this); System.out.println("Add "+n+" as the left leaf of "+this.value);}
-			else this.left.AddNodeAsBST(n);
+			else this.left.InsertNode(n);
 		}
 		else {
 			if(this.right == null) {this.right=new Node(n, this); System.out.println("Add "+n+" as the right leaf of "+this.value);}
-			else this.right.AddNodeAsBST(n);
+			else this.right.InsertNode(n);
+		}
+	}
+	
+	Node NextNodeInOrder() {
+		if(this.parent == null || this.right != null) {
+			// bug here!! if this.right is null, NullPointerException
+			return(this.right.LeftMostNode());
+		}
+		else {
+			Node parentNode = this.parent;
+			if (parentNode.left == this) return parentNode;
+			else return(parentNode.NextNodeInOrder());
+		}
+		
+	}
+	
+	Node LeftMostNode() {
+		if(this == null ) return null;
+		if(this.left == null) return this;
+		else {
+			Node index = this.left;
+			while(index.left != null) {
+				index = index.left;
+			}
+			return index;
 		}
 	}
 }
