@@ -8,6 +8,16 @@
  * 
  * Binary tree algorithm practice
  *
+ * 4.1
+ * Implement a function to check if a tree is balanced. For the purposes of this question, 
+ * a balanced tree is defined to be a tree such that no two leaf nodes differ in distance 
+ * from the root by more than one.
+ * 
+ * 4.5
+ * Write an algorithm to find the ¡®next¡¯ node (i.e., in-order successor) of a given node in 
+ * a binary search tree where each node has a link to its parent.
+ * 
+ * 
  */
 //import java.util.*;
 
@@ -31,7 +41,11 @@ public class BinaryTree {
 		if(bt.isBalanced()) System.out.println("Balanced Tree");
 		else System.out.println("Not a Balanced Tree");
 		
-		System.out.println(bt.root.NextNodeInOrder().value);
+		System.out.println(bt.toString());
+		
+		Node n = bt.root.NextNodeInOrder();
+		if (n==null) System.out.println("root don't have a In-Order successor");
+		else System.out.println(n.value);
 	}
 
 	Node root;
@@ -75,6 +89,12 @@ public class BinaryTree {
 	void InsertNode(int n) {
 		if (root==null) root = new Node(n);
 		else root.InsertNode(n);
+	}
+	
+	// @override
+	public String toString() {
+		if (root == null) return "";
+		else return root.toString();
 	}
 }
 
@@ -139,9 +159,9 @@ class Node{
 	}
 	
 	Node NextNodeInOrder() {
-		if(this.parent == null || this.right != null) {
-			// bug here!! if this.right is null, NullPointerException
-			return(this.right.LeftMostNode());
+		if(this.parent == null) {
+			if(this.right != null) return(this.right.LeftMostNode());
+			else return null;
 		}
 		else {
 			Node parentNode = this.parent;
@@ -152,7 +172,7 @@ class Node{
 	}
 	
 	Node LeftMostNode() {
-		if(this == null ) return null;
+		//if(this == null) return null;
 		if(this.left == null) return this;
 		else {
 			Node index = this.left;
@@ -161,5 +181,18 @@ class Node{
 			}
 			return index;
 		}
+	}
+	
+	public String toString() {
+		String result = Integer.toString(this.value)+"\t";
+		if (this.left == null) result += "Left node is null\t";
+		else result += "Left node is " + this.left.value + "\t";
+		if (this.right == null) result += "Right node is null\t";
+		else result += "Right node is " + this.right.value;
+		
+		if (this.left != null) result += "\n" + this.left.toString();
+		if (this.right != null) result += "\n" + this.right.toString();
+		
+		return result;
 	}
 }
