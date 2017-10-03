@@ -8,7 +8,7 @@ public class Percolation {
 	private int size;
 	private int openSites;
 	
-	public Percolation(int n) { // create n-by-n grid, with all sites blocked
+	public Percolation(int n) { //create n-by-n grid, with all sites blocked
 		if(n<=0) {
 			throw new IllegalArgumentException("the size of grid must be greater than 0");
 		}
@@ -34,6 +34,7 @@ public class Percolation {
 		}
 		
 		if (isOpen(row, col)) return;
+		isSiteOpen[convert(row,col)] = true;
 		if (row>1 && isOpen(row-1,col)) unionFind.union(convert(row, col), convert(row-1, col));
 		if (row<size && isOpen(row+1,col)) unionFind.union(convert(row, col), convert(row+1, col));
 		if (col>1 && isOpen(row, col-1)) unionFind.union(convert(row, col), convert(row, col-1));
@@ -66,8 +67,20 @@ public class Percolation {
 	   
 
 	public static void main(String[] args) {
-		
-
+		try {
+			Percolation per = new Percolation(5);
+			per.open(3, 3);
+			per.open(2, 3);
+			per.open(5, 3);
+			per.open(4, 3);
+			per.open(1, 3);
+			System.out.println(per.isOpen(3, 3));
+			System.out.println(per.isFull(3, 3));
+			System.out.println(per.numberOfOpenSites());
+		}
+		catch(IllegalArgumentException e) {
+			System.out.println(e);
+		}
 	}
 
 }
