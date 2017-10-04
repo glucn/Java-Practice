@@ -4,10 +4,35 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class TicTacToe implements ActionListener{
+class TicTacToeButton extends JButton{
+	private static final long serialVersionUID = 1L;
+	private int row; // start from 0
+	private int col; // start from 0
+	
+	TicTacToeButton(String text, int row, int col){
+		super(text);
+		this.row = row;
+		this.col = col;
+	}
+	
+	public void setIndex(int row, int col) {
+		this.row = row;
+		this.col = col;
+	}
+	
+	public int getRow() {
+		return this.row;
+	}
+	
+	public int getCol() {
+		return this.col;
+	}
+}
 
+public class TicTacToe implements ActionListener{
+	private static final int SIZE = 5;
 	private JFrame frame;
-	private JButton[][] button;
+	private TicTacToeButton[][] button;
 	private boolean isO;
 	
 	public static void main(String[] args) {
@@ -21,35 +46,84 @@ public class TicTacToe implements ActionListener{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		Container pane = frame.getContentPane();
-		pane.setLayout(new GridLayout(3,3));
+		pane.setLayout(new GridLayout(SIZE,SIZE));
 		
-		button = new JButton[3][3];
-		for(int i=0; i<3; i++) {
-			for(int j=0; j<3; j++) {
-				button[i][j] = new JButton(" ");
-				button[i][j].addActionListener(this); 
-				pane.add(button[i][j]);
+		button = new TicTacToeButton[SIZE][SIZE];
+		for(int i=0; i<SIZE; i++) {
+			for (int j=0; j<SIZE; j++) {
+				TicTacToeButton b = new TicTacToeButton(" ", i, j);
+				b.addActionListener(this); 
+				pane.add(b);
+				button[i][j] = b;
 			}
 		}
 
 		frame.pack();
-		frame.setSize(300, 300);
+		frame.setSize(SIZE*100, SIZE*100);
 		frame.setVisible(true);
 	}
 
 	
 	public void actionPerformed(ActionEvent e) {
-		JButton b = (JButton)e.getSource();
+		TicTacToeButton b = (TicTacToeButton)e.getSource();
 		if(b.getText()==" ") {
-			//String state;
 			if(isO) {
 				b.setText("O");
-				//state = "O";
 			}
 			else {
 				b.setText("X");
-				//state = "X";
 			}
+			
+			int row = b.getRow();
+			int col = b.getCol();
+			int i, j;
+			// check row
+			for (j = 0; j < SIZE; ++j) {
+				if (!(isO && button[row][j].getText().equals("O")) && !(!isO && button[row][j].getText().equals("X"))) break;
+			}
+			if(j==SIZE) {
+				JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
+				isO = !isO;
+				b.setEnabled(false);
+				return;
+			}
+			// check row
+			for (i = 0; i < SIZE; ++i) {
+				if (!(isO && button[i][col].getText().equals("O")) && !(!isO && button[i][col].getText().equals("X"))) break;
+			}
+			if(i==SIZE) {
+				JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
+				isO = !isO;
+				b.setEnabled(false);
+				return;
+			}
+			
+			// diagonal
+			if(row == col) {
+				for(i = 0; i < SIZE; ++i) {
+					if (!(isO && button[i][i].getText().equals("O")) && !(!isO && button[i][i].getText().equals("X"))) break;
+				}
+				if(i==SIZE) {
+					JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
+					isO = !isO;
+					b.setEnabled(false);
+					return;
+				}
+			}
+			
+			// counter-diagonal
+			if(row + col == SIZE-1) {
+				for(i = 0; i < SIZE; ++i) {
+					if (!(isO && button[i][SIZE-i-1].getText().equals("O")) && !(!isO && button[i][SIZE-i-1].getText().equals("X"))) break;
+				}
+				if(i==SIZE) {
+					JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
+					isO = !isO;
+					b.setEnabled(false);
+					return;
+				}
+			}
+			
 			isO = !isO;
 			b.setEnabled(false);
 		}
