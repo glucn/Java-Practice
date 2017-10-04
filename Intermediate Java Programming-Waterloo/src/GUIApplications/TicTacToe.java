@@ -42,7 +42,7 @@ public class TicTacToe implements ActionListener{
 	}
 
 	public void start() {
-		frame = new JFrame("Grid Layout");
+		frame = new JFrame("Tic-Tac-Toe");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		Container pane = frame.getContentPane();
@@ -82,9 +82,7 @@ public class TicTacToe implements ActionListener{
 				if (!(isO && button[row][j].getText().equals("O")) && !(!isO && button[row][j].getText().equals("X"))) break;
 			}
 			if(j==SIZE) {
-				JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
-				isO = !isO;
-				b.setEnabled(false);
+				restart(isO);
 				return;
 			}
 			// check row
@@ -92,9 +90,7 @@ public class TicTacToe implements ActionListener{
 				if (!(isO && button[i][col].getText().equals("O")) && !(!isO && button[i][col].getText().equals("X"))) break;
 			}
 			if(i==SIZE) {
-				JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
-				isO = !isO;
-				b.setEnabled(false);
+				restart(isO);
 				return;
 			}
 			
@@ -104,9 +100,7 @@ public class TicTacToe implements ActionListener{
 					if (!(isO && button[i][i].getText().equals("O")) && !(!isO && button[i][i].getText().equals("X"))) break;
 				}
 				if(i==SIZE) {
-					JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
-					isO = !isO;
-					b.setEnabled(false);
+					restart(isO);
 					return;
 				}
 			}
@@ -117,9 +111,7 @@ public class TicTacToe implements ActionListener{
 					if (!(isO && button[i][SIZE-i-1].getText().equals("O")) && !(!isO && button[i][SIZE-i-1].getText().equals("X"))) break;
 				}
 				if(i==SIZE) {
-					JOptionPane.showMessageDialog(frame, "Win!", "WIN", JOptionPane.OK_OPTION);
-					isO = !isO;
-					b.setEnabled(false);
+					restart(isO);
 					return;
 				}
 			}
@@ -128,5 +120,31 @@ public class TicTacToe implements ActionListener{
 			b.setEnabled(false);
 		}
 		
+	}
+	
+	void restart(boolean isO) {
+		String message;
+		if (isO) {
+			message = "O wins the game! Restart?";
+		}
+		else {
+			message = "X wins the game! Restart?";
+		}
+		int option = JOptionPane.showConfirmDialog(frame, message, "WIN", JOptionPane.OK_CANCEL_OPTION);
+		if (option == JOptionPane.OK_OPTION) {
+			for (int i = 0; i < SIZE; i++) {
+				for (int j = 0; j < SIZE; j++) {
+					button[i][j].setText(" ");
+					button[i][j].setEnabled(true);
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < SIZE; i++) {
+				for (int j = 0; j < SIZE; j++) {
+					button[i][j].setEnabled(false);
+				}
+			}
+		}
 	}
 }
