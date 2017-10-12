@@ -11,7 +11,7 @@ public class Deque<Item> implements Iterable<Item> {
     }
     
     public boolean isEmpty() { // is the deque empty?
-        return (first == last);    
+        return (first == null);    
     }
     
     public int size() { // return the number of items on the deque
@@ -24,8 +24,8 @@ public class Deque<Item> implements Iterable<Item> {
     	}
         Node oldFirst = this.first;
         first = new Node(item, null, oldFirst);
-        if (oldFirst == null) {last = first;}
-        else {oldFirst.setPrevious(first);}
+        if (oldFirst == null) { last = first; }
+        else { oldFirst.setPrevious(first); }
         size++;
     }
     
@@ -35,8 +35,8 @@ public class Deque<Item> implements Iterable<Item> {
     	}
         Node oldLast = this.last;
         last = new Node(item, oldLast, null);
-        if (oldLast == null) {first = last;}
-        else {oldLast.setNext(last);}
+        if (oldLast == null) { first = last; }
+        else { oldLast.setNext(last); }
         size++;
     }
     
@@ -46,8 +46,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
         Item value = first.getValue();
         first = first.getNext();
-        if (first == null) {last = null;}
-        else {first.setPrevious(null);}
+        if (first == null) { last = null; }
+        else { first.setPrevious(null); }
         size--;
         return value;
     }
@@ -58,8 +58,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
         Item value = last.getValue();
         last = last.getPrevious();
-        if (last == null) {first = null;}
-        else {last.setNext(null);}
+        if (last == null) { first = null; }
+        else { last.setNext(null); }
         size--;
         return value;
     }
@@ -70,37 +70,40 @@ public class Deque<Item> implements Iterable<Item> {
 	   
     public static void main(String[] args) { // unit testing (optional)
         Deque<Integer> test = new Deque<Integer>();
-        for (int i = 0; i < 10; i++) test.addLast(i);
-         for (Integer i: test) System.out.println(i);
+        // for (int i = 0; i < 10; i++) test.addLast(i);
+        // for (int i: test) System.out.println(i);
+        
+        test.addFirst(1);
+        System.out.println(test.isEmpty());
 
 	}
 
     private class Node {
-    	private Item value;
+    	private final Item value;
     	private Node previous;
     	private Node next;
     	
-    	Node(Item value, Node previous, Node next){
+    	Node(Item value, Node previous, Node next) {
     		this.value = value;
     		this.previous = previous;
     		this.next = next;
     	}
     	
-    	Item getValue() {return(this.value);}
+    	Item getValue() { return (this.value); }
     	// void setValue(Item value) {this.value = value;}
     	
-    	Node getPrevious() {return(this.previous);}
-    	void setPrevious(Node previous) {this.previous = previous;}
+    	Node getPrevious() { return (this.previous); }
+    	void setPrevious(Node previous) { this.previous = previous; }
     	
-    	Node getNext() {return(this.next);}
-    	void setNext(Node next) {this.next = next;}
+    	Node getNext() { return (this.next); }
+    	void setNext(Node next) { this.next = next; }
     }
     
     private class DequeIterator implements Iterator<Item> {
 
     	private Node current = first;
     	
-    	public boolean hasNext() {return(current != null);}
+    	public boolean hasNext() { return (current != null); }
     	
     	public void remove() {
     		throw new UnsupportedOperationException("remove() is not supported");
