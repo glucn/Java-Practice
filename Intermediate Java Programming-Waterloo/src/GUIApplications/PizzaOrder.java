@@ -3,6 +3,7 @@ package GUIApplications;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.*;
 
 public class PizzaOrder {
 
@@ -200,18 +201,135 @@ public class PizzaOrder {
 	}
 	
 	private void setSouthContent() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.setBorder(BorderFactory.createTitledBorder("Deliver To:"));
 		
+		JPanel smallPanel = new JPanel();
+		smallPanel.setLayout(new BoxLayout(smallPanel,BoxLayout.Y_AXIS));
+		smallPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		smallPanel.add(new JLabel("Name:"));
+		smallPanel.add(new JLabel("Address:"));
+		smallPanel.add(new JLabel("City, St, Zip:"));
+		panel.add(smallPanel);
+		
+		smallPanel = new JPanel();
+		smallPanel.setLayout(new BoxLayout(smallPanel,BoxLayout.Y_AXIS));
+		smallPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		nameText = new JTextField();
+		addressText = new JTextField();
+		cityText = new JTextField();
+		smallPanel.add(nameText);
+		smallPanel.add(addressText);
+		smallPanel.add(cityText);
+		panel.add(smallPanel);
+		
+		contentPane.add(panel, BorderLayout.SOUTH);
 	}
 	
 	private class NewOrderListener implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
-			
+			regularCrustButton.setSelected(true);
+			pepperoniBox.setSelected(false);
+			sausageBox.setSelected(false);
+			cheeseBox.setSelected(false);
+			pepperBox.setSelected(false);
+			onionBox.setSelected(false);
+			mushroomBox.setSelected(false);
+			oliveBox.setSelected(false);
+			anchovyBox.setSelected(false);
+			breadSticksText.setText("");
+			buffaloWingsText.setText("");
+			nameText.setText("");
+			addressText.setText("");
+			cityText.setText("");
 		}
 	}
 	
 	private class SaveOrderListener implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
+			String order =	"Pizza Order\n" +
+							"===========\n" +
+					        "Crust:\n";
+			if (regularCrustButton.isSelected())
+				   order += "     Regular\n";
+			else if (thinCrustButton.isSelected())
+				   order += "     Thin\n";
+			else if (deepCrustButton.isSelected())
+				   order += "     Deep-Dish\n";
+			else if (handCrustButton.isSelected())
+				   order += "     Hand-Tossed\n";
+			else
+				   JOptionPane.showMessageDialog(frame, 
+				   "You must select a crust type!",
+				   "Crust Type Error", 
+				   JOptionPane.ERROR_MESSAGE);
+			order += "Toppings:\n";
+			if (pepperoniBox.isSelected())
+			   order += "     Pepperoni\n";
+			if (sausageBox.isSelected())
+			   order += "     Sausage\n";
+			if (cheeseBox.isSelected())
+			   order += "     Extra Cheese\n";
+			if (pepperBox.isSelected())
+			   order += "     Peppers\n";
+			if (onionBox.isSelected())
+			   order += "     Onions\n";
+			if (mushroomBox.isSelected())
+			   order += "     Mushrooms\n";
+			if (oliveBox.isSelected())
+			   order += "     Olives\n";
+			if (anchovyBox.isSelected())
+			   order += "     Anchovies\n";
+			int bs = 0;
+			int bw = 0;
+			try
+			{
+			   if (!breadSticksText.getText().isEmpty())
+			      bs = Integer.parseInt(breadSticksText.getText());
+			   if (!buffaloWingsText.getText().isEmpty())
+			      bw = Integer.parseInt(buffaloWingsText.getText());
+			}
+			catch (NumberFormatException nfe)
+			{
+			   JOptionPane.showMessageDialog(frame, 
+			      "Side order entries must be numeric,\n" +
+			      "and must be whole numbers", 
+			      "Side Order Error", 
+			      JOptionPane.ERROR_MESSAGE);
+			}
+			if (bs > 0 || bw > 0)
+			{
+			   order += "Sides:\n";
+			   if (bs > 0)
+			      order += "     " + bs + " Bread Sticks\n";
+			   if (bw > 0)
+			      order += "     " + bw + " Buffalo Wings\n";
+			}
 			
+			if (nameText.getText().isEmpty() ||
+					   addressText.getText().isEmpty() ||
+					   cityText.getText().isEmpty())
+					JOptionPane.showMessageDialog(frame, 
+					   "Address fields may not be empty.",
+					   "Address Error", 
+					   JOptionPane.ERROR_MESSAGE);
+			else{
+				order += "Deliver To:\n";
+				order += "     " + nameText.getText() + "\n";
+				order += "     " + addressText.getText() + "\n";
+				order += "     " + cityText.getText() + "\n";
+			}
+			order += "\n***END OF ORDER ***\n";
+					   
+			try {
+				PrintStream oFile = new PrintStream("PizzaOrder.txt");
+				oFile.print(order);
+				oFile.close();
+			}
+			catch(IOException ioe) {
+				System.out.println("\n*** I/O Error ***\n" + ioe);
+			}
 		}
 	}
 	
