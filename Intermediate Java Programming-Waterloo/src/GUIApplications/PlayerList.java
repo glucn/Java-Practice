@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.*;
 
-class Player
+class Player implements Comparable<Player>
 {
     private int number;
     private String name;
@@ -77,7 +77,17 @@ class Player
     public double getAvgAssists()
     {
         return avgAssists;
-    }    
+    }
+    
+    public int compareTo(Player p)
+    {
+        if (number > p.number)
+            return 1;
+        else if (number < p.number)
+            return -1;
+        else
+            return 0;
+    }
 }
 
 public class PlayerList
@@ -104,6 +114,11 @@ public class PlayerList
     
     private ArrayList<Player> list;
     private ListIterator<Player> lit;
+    private boolean isForward;
+    
+    // team view fields
+    private JTextArea textArea;
+    private JScrollPane scrollArea;
     
     public static void main (String[] args) 
     {
@@ -230,59 +245,85 @@ public class PlayerList
     	contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     	contentPane.setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
     	
+    	JTabbedPane tab = new JTabbedPane();
+    	
+    	JPanel panel = new JPanel();
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    	panel.setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
+    	
     	// player name
     	nameLabel = new JLabel("Player Name:");
     	nameLabel.setFont(new Font("Trebuchet MS",Font.BOLD + Font.ITALIC,14));
-    	contentPane.add(nameLabel);
+    	panel.add(nameLabel);
     	playerName = new JTextField();
     	playerName.setFont(new Font("Trebuchet MS",Font.PLAIN,14));
     	playerName.setForeground(Color.BLUE);
-    	contentPane.add(playerName);
+    	panel.add(playerName);
     	
     	// player number
         numLabel = new JLabel("Player Number:");
         numLabel.setFont(new Font("Trebuchet MS",Font.BOLD + Font.ITALIC,14));
-        contentPane.add(numLabel);
+        panel.add(numLabel);
         playerNum = new JTextField();
         playerNum.setFont(new Font("Trebuchet MS",Font.PLAIN,14));
         playerNum.setForeground(Color.BLUE);
-        contentPane.add(playerNum);
+        panel.add(playerNum);
 
         // player position
         positionLabel = new JLabel("Position:");
         positionLabel.setFont(new Font("Trebuchet MS",Font.BOLD + Font.ITALIC,14));
-        contentPane.add(positionLabel);
+        panel.add(positionLabel);
         playerPosition = new JTextField();
         playerPosition.setFont(new Font("Trebuchet MS",Font.PLAIN,14));
         playerPosition.setForeground(Color.BLUE);
-        contentPane.add(playerPosition);
+        panel.add(playerPosition);
 
         // average points
         avgPtsLabel = new JLabel("Average Points per Game:");
         avgPtsLabel.setFont(new Font("Trebuchet MS",Font.BOLD + Font.ITALIC,14));
-        contentPane.add(avgPtsLabel);
+        panel.add(avgPtsLabel);
         playerAvgPts = new JTextField();
         playerAvgPts.setFont(new Font("Trebuchet MS",Font.PLAIN,14));
         playerAvgPts.setForeground(Color.BLUE);
-        contentPane.add(playerAvgPts);
+        panel.add(playerAvgPts);
             
         // average rebounds
         avgRbndsLabel = new JLabel("Average Rebounds per Game:");
         avgRbndsLabel.setFont(new Font("Trebuchet MS",Font.BOLD + Font.ITALIC,14));
-        contentPane.add(avgRbndsLabel);
+        panel.add(avgRbndsLabel);
         playerAvgRbnds = new JTextField();
         playerAvgRbnds.setFont(new Font("Trebuchet MS",Font.PLAIN,14));
         playerAvgRbnds.setForeground(Color.BLUE);
-        contentPane.add(playerAvgRbnds);
+        panel.add(playerAvgRbnds);
 
         // average assists
         avgAssistsLabel = new JLabel("Average Assists per Game:");
         avgAssistsLabel.setFont(new Font("Trebuchet MS",Font.BOLD + Font.ITALIC,14));
-        contentPane.add(avgAssistsLabel);
+        panel.add(avgAssistsLabel);
         playerAvgAssists = new JTextField();
         playerAvgAssists.setFont(new Font("Trebuchet MS",Font.PLAIN,14));
         playerAvgAssists.setForeground(Color.BLUE);
-        contentPane.add(playerAvgAssists);
+        panel.add(playerAvgAssists);
+        
+        tab.addTab("Player View", panel);
+        tab.setMnemonicAt(0, KeyEvent.VK_P);
+        
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
+        
+        textArea = new JTextArea(15,25);
+        scrollArea = new JScrollPane(textArea);
+        scrollArea.setVerticalScrollBarPolicy(
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollArea.setHorizontalScrollBarPolicy(
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        panel.add(scrollArea);
+                
+        tab.addTab("Team View", panel);
+        tab.setMnemonicAt(1, KeyEvent.VK_T);
+        
+        contentPane.add(tab);
     }
 
     private void getPlayer(Player p)
@@ -347,11 +388,20 @@ public class PlayerList
         	    System.exit(1);
         	}
         	
+        	Collections.sort(list);
+        	
         	lit = list.listIterator();
         	if (lit.hasNext())
         	{
         	    Player p = lit.next();
         	    getPlayer(p);
+        	}
+        	
+        	isForward = true;
+        	
+        	for (Player p : list)
+        	{
+        	    textArea.setText(textArea.getText() + p.toString() + "\n\n");
         	}
         }
     }
@@ -369,10 +419,26 @@ public class PlayerList
     {
         public void actionPerformed(ActionEvent ae)
         {
-            JOptionPane.showMessageDialog(frame, 
-                    "The Next menu item was selected", 
-                    "Next Menu Item", 
-                    JOptionPane.INFORMATION_MESSAGE);
+        	if (list == null || list.size() == 0)
+                return;
+            if (!isForward)
+            {
+                lit.next();
+                isForward = true;
+            }
+                
+            if (lit.hasNext())
+            {
+                Player p = lit.next();
+                getPlayer(p);
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(frame, 
+                    "There are no more players.\nYou have reached the end of the list.", 
+                    "End of List", 
+                    JOptionPane.WARNING_MESSAGE);
+            }
         }
     }    
 
@@ -380,10 +446,25 @@ public class PlayerList
     {
         public void actionPerformed(ActionEvent ae)
         {
-            JOptionPane.showMessageDialog(frame, 
-                    "The Previous menu item was selected", 
-                    "Previous Menu Item", 
-                    JOptionPane.INFORMATION_MESSAGE);
+        	if (list == null || list.size() == 0)
+        	    return;
+        	            
+        	if (isForward)
+        	{
+        	    lit.previous();
+        	    isForward = false;
+        	}
+        	            
+        	if (lit.hasPrevious())
+        	{
+        	    Player p = lit.previous();
+        	    getPlayer(p);
+        	}
+        	else
+        	    JOptionPane.showMessageDialog(frame, 
+        	        "There are no previous players.\nYou are at the start of the list.", 
+        	        "Start of List", 
+        	        JOptionPane.WARNING_MESSAGE);
         }
     }
     
