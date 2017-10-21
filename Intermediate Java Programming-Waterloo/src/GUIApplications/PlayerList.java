@@ -25,6 +25,7 @@ class Player implements Comparable<Player>
         avgAssists = pAssists;
     }
 
+    
     public String toString()
     {
         return "Player: " + name + 
@@ -112,9 +113,7 @@ public class PlayerList
     private JTextField playerAvgRbnds;
     private JTextField playerAvgAssists;
     
-    private ArrayList<Player> list;
-    private ListIterator<Player> lit;
-    private boolean isForward;
+    private TreeMap<Integer, Player> map;
     
     // team view fields
     private JTextArea textArea;
@@ -360,7 +359,7 @@ public class PlayerList
         	if (playerFile == null)
         	    return; 
         	
-        	list = new ArrayList<Player>();
+        	map = new TreeMap<Integer, Player>();
         	try
         	{
         	    Scanner scan = new Scanner(playerFile);
@@ -372,7 +371,8 @@ public class PlayerList
         	        double avgPoints = scan.nextDouble();
         	        double avgRebounds = scan.nextDouble();
         	        double avgAssists = scan.nextDouble();
-        	        list.add(new Player(name, nbr, position, avgPoints, avgRebounds, avgAssists));
+        	        map.put(new Integer(nbr),
+        	                new Player(name, nbr, position, avgPoints, avgRebounds, avgAssists));
         	    }
         	                
         	    scan.close();
@@ -388,24 +388,54 @@ public class PlayerList
         	    System.exit(1);
         	}
         	
-        	Collections.sort(list);
-        	
-        	lit = list.listIterator();
-        	if (lit.hasNext())
-        	{
-        	    Player p = lit.next();
-        	    getPlayer(p);
-        	}
-        	
-        	isForward = true;
-        	
-        	for (Player p : list)
+        	findPlayer();
+	
+        	for (Player p : map.values())
         	{
         	    textArea.setText(textArea.getText() + p.toString() + "\n\n");
         	}
         }
     }
     
+    private void findPlayer()
+    {
+        boolean isGoodNumber = false;
+        Integer playerNum = new Integer(0);
+        while (!isGoodNumber)
+        {
+            try
+            {
+                playerNum = new Integer(
+                            Integer.parseInt(JOptionPane.showInputDialog(frame,
+                            "Enter a player number:",
+                            "Player Entry",
+                            JOptionPane.QUESTION_MESSAGE)));
+                isGoodNumber = true;
+            }
+            catch(NumberFormatException nfe)
+            {
+                JOptionPane.showMessageDialog(frame, 
+                    "That wasn't a player number!", 
+                    "Player Number Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+                
+            if(isGoodNumber)
+            {
+                Player p = map.get(playerNum);
+                if (p == null)
+                {
+                    JOptionPane.showMessageDialog(frame, 
+                        "Player number " + playerNum.intValue() + "does not exist!", 
+                        "Player Number Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    isGoodNumber = false;
+                }
+                else
+                    getPlayer(p);
+            }
+        }
+    }
     
     private class ExitMenuItemListener implements ActionListener
     {
@@ -419,26 +449,20 @@ public class PlayerList
     {
         public void actionPerformed(ActionEvent ae)
         {
-        	if (list == null || list.size() == 0)
+        	if (map == null || map.size() == 0)
                 return;
-            if (!isForward)
-            {
-                lit.next();
-                isForward = true;
-            }
-                
-            if (lit.hasNext())
-            {
-                Player p = lit.next();
-                getPlayer(p);
-            }
-            else
-            {
+
+        	Map.Entry<Integer, Player> entry = map.higherEntry(Integer.parseInt(
+        		    playerNum.getText()));
+        	if (entry == null) {
                 JOptionPane.showMessageDialog(frame, 
                     "There are no more players.\nYou have reached the end of the list.", 
                     "End of List", 
                     JOptionPane.WARNING_MESSAGE);
             }
+        	else {
+        	    getPlayer(entry.getValue());
+        	}
         }
     }    
 
@@ -446,25 +470,20 @@ public class PlayerList
     {
         public void actionPerformed(ActionEvent ae)
         {
-        	if (list == null || list.size() == 0)
-        	    return;
-        	            
-        	if (isForward)
-        	{
-        	    lit.previous();
-        	    isForward = false;
+        	if (map == null || map.size() == 0)
+                return;
+
+        	Map.Entry<Integer, Player> entry = map.lowerEntry(Integer.parseInt(
+        		    playerNum.getText()));
+        	if (entry == null) {
+                JOptionPane.showMessageDialog(frame, 
+                    "There are no more players.\nYou have reached the end of the list.", 
+                    "End of List", 
+                    JOptionPane.WARNING_MESSAGE);
+            }
+        	else {
+        	    getPlayer(entry.getValue());
         	}
-        	            
-        	if (lit.hasPrevious())
-        	{
-        	    Player p = lit.previous();
-        	    getPlayer(p);
-        	}
-        	else
-        	    JOptionPane.showMessageDialog(frame, 
-        	        "There are no previous players.\nYou are at the start of the list.", 
-        	        "Start of List", 
-        	        JOptionPane.WARNING_MESSAGE);
         }
     }
     
